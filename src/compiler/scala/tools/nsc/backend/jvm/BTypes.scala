@@ -929,6 +929,9 @@ abstract class BTypes {
       */
     def withoutLock[T <: AnyRef](t: => T): Lazy[T] = new LazyWithoutLock[T](() => t)
 
+    val eagerNil = eager(Nil)
+    val eagerNone = eager(None)
+
     private final class Eager[T](val force: T) extends Lazy[T] {
       def onForce(f: T => Unit): Unit = f(force)
 
@@ -960,7 +963,7 @@ abstract class BTypes {
           result = init(t)
           t = null
           this.synchronized {
-            postForce foreach (_ (result))
+            postForce foreach (_.apply (result))
             postForce = Nil
           }
           result
